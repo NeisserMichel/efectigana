@@ -2,24 +2,15 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../lib/auth'
 import { useLiveDraws } from '../lib/useDraws'
 import { supabase, type Draw, type Pool } from '../lib/supabase'
-import { countdown, fechaLima, pad, soles } from '../lib/format'
+import { fechaLima, soles } from '../lib/format'
+import { CountdownCard, PoolGrid } from '../components/Pools'
 import { BetModal } from '../components/BetModal'
 import { RechargeModal } from '../components/RechargeModal'
 import { DownloadAppButton } from '../components/AppUpdate'
 
-function useNow() {
-  const [now, setNow] = useState(Date.now())
-  useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 1000)
-    return () => clearInterval(t)
-  }, [])
-  return now
-}
-
 export default function HomePage() {
   const { profile, session } = useAuth()
   const { pools, draws, loading } = useLiveDraws()
-  const now = useNow()
   const [bet, setBet] = useState<{ pool: Pool; draw: Draw } | null>(null)
   const [recharge, setRecharge] = useState(false)
   const [mine, setMine] = useState<Record<number, number>>({})
@@ -53,16 +44,13 @@ export default function HomePage() {
       .then(({ data }) => setWinners((data as never) || []))
   }, [openIds])
 
-  const nextDraw = Object.values(draws)[0]?.draw_at
-  const cd = nextDraw ? countdown(nextDraw, now) : null
-  const totalAll = Object.values(draws).reduce((a, d) => a + Number(d.total), 0)
 
   return (
     <div className="page">
       <DownloadAppButton compact />
       <section className="balance-card">
         <div>
-          <span className="label">Tu saldo</span>
+          <span className="label">Hola, {profile?.username ? '@' + profile.username : profile?.code} 👋 · Tu saldo</span>
           <div className="balance">{soles(profile?.balance)}</div>
           <span className="code">ID: {profile?.code}</span>
         </div>
@@ -71,69 +59,11 @@ export default function HomePage() {
         </button>
       </section>
 
-      <section className="countdown-card">
-        <div className="cd-title">
-          <span className="live-dot" /> Próximo sorteo {nextDraw && <small>· {fechaLima(nextDraw)}</small>}
-        </div>
-        {cd && (
-          <div className="cd">
-            {[
-              ['días', cd.d],
-              ['horas', cd.h],
-              ['min', cd.m],
-              ['seg', cd.s],
-            ].map(([l, v]) => (
-              <div key={l as string}>
-                <b>{pad(v as number)}</b>
-                <span>{l}</span>
-              </div>
-            ))}
-          </div>
-        )}
-        {cd?.done && <p className="muted center">Sorteando… los resultados aparecerán en unos instantes.</p>}
-        <p className="cd-total">
-          Recaudado en todos los pozos: <b>{soles(totalAll)}</b>
-        </p>
-      </section>
+      <CountdownCard draws={draws} />
 
       <h2 className="section-title">Pozos de esta semana</h2>
       {loading && <p className="muted">Cargando pozos…</p>}
-      <div className="pools">
-        {pools.map((p) => {
-          const d = draws[p.id]
-          const my = d ? mine[d.id] || 0 : 0
-          return (
-            <article key={p.id} className="pool" style={{ ['--c' as string]: p.color }}>
-              <header>
-                <span className="pool-name">{p.name}</span>
-                <span className="price">{soles(p.ticket_price)} / jugada</span>
-              </header>
-              <div className="pot">
-                <span className="live">EN VIVO</span>
-                <b>{soles(d?.total)}</b>
-                <small>recaudado</small>
-              </div>
-              <div className="stats">
-                <div>
-                  <b>{d?.participants ?? 0}</b>
-                  <span>participantes</span>
-                </div>
-                <div>
-                  <b>{d?.tickets ?? 0}</b>
-                  <span>jugadas</span>
-                </div>
-                <div>
-                  <b>{my}</b>
-                  <span>mis jugadas</span>
-                </div>
-              </div>
-              <button className="btn primary block" disabled={!d || cd?.done} onClick={() => d && setBet({ pool: p, draw: d })}>
-                Jugar en este pozo
-              </button>
-            </article>
-          )
-        })}
-      </div>
+      <PoolGrid pools={pools} draws={draws} mine={mine} onPlay={(pool, draw) => setBet({ pool, draw })} />
 
       <section className="how">
         <h2 className="section-title">¿Cómo funciona?</h2>

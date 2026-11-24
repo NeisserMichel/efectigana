@@ -4,7 +4,7 @@ import { fechaLima, soles } from '../lib/format'
 import { Modal } from '../components/Modal'
 import { useLiveDraws } from '../lib/useDraws'
 
-type Req = RechargeRequest & { profiles: Pick<Profile, 'code' | 'phone' | 'email'> }
+type Req = RechargeRequest & { profiles: Pick<Profile, 'code' | 'phone' | 'email' | 'username'> }
 
 export default function AdminPage() {
   const [tab, setTab] = useState<'recargas' | 'usuarios' | 'sorteos'>('recargas')
@@ -39,7 +39,7 @@ function Recargas() {
   const load = useCallback(async () => {
     const { data } = await supabase
       .from('recharge_requests')
-      .select('*, profiles(code,phone,email)')
+      .select('*, profiles(code,phone,email,username)')
       .eq('status', status)
       .order('created_at', { ascending: status === 'pendiente' })
       .limit(100)
@@ -86,10 +86,10 @@ function Recargas() {
           <div key={r.id} className="row">
             <div>
               <b>
-                #{r.id} · {r.profiles?.code} · {soles(r.amount)}
+                #{r.id} · @{r.profiles?.username || r.profiles?.code} · {soles(r.amount)}
               </b>
               <span>
-                +51 {r.profiles?.phone} · {r.profiles?.email}
+                {r.profiles?.code} · +51 {r.profiles?.phone} · {r.profiles?.email}
               </span>
               <span>{fechaLima(r.created_at)}</span>
             </div>
@@ -121,7 +121,7 @@ function Usuarios() {
   const load = useCallback(async () => {
     let query = supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(100)
     const s = q.trim().replace(/[,()%]/g, '')
-    if (s) query = query.or(`code.ilike.%${s}%,email.ilike.%${s}%,phone.ilike.%${s}%`)
+    if (s) query = query.or(`code.ilike.%${s}%,username.ilike.%${s}%,email.ilike.%${s}%,phone.ilike.%${s}%`)
     const { data } = await query
     setUsers((data as Profile[]) || [])
   }, [q])
@@ -133,13 +133,13 @@ function Usuarios() {
 
   return (
     <>
-      <input className="search" placeholder="Buscar por ID (EG-1001), correo o celular…" value={q} onChange={(e) => setQ(e.target.value)} />
+      <input className="search" placeholder="Buscar por usuario, ID (EG-1001), correo o celular…" value={q} onChange={(e) => setQ(e.target.value)} />
       <div className="list">
         {users.map((u) => (
           <button key={u.id} className="row clickable" onClick={() => setSel(u)}>
             <div>
               <b>
-                {u.code} {u.is_admin && <span className="badge aprobada">admin</span>} {u.is_blocked && <span className="badge rechazada">bloqueado</span>}
+                @{u.username || '—'} · {u.code} {u.is_admin && <span className="badge aprobada">admin</span>} {u.is_blocked && <span className="badge rechazada">bloqueado</span>}
               </b>
               <span>
                 {u.email} · +51 {u.phone}
@@ -206,7 +206,7 @@ function UserModal({ user, onClose, onChanged }: { user: Profile; onClose: () =>
   }
 
   return (
-    <Modal title={`Usuario ${user.code}`} onClose={onClose}>
+    <Modal title={`@${user.username || '—'} · ${user.code}`} onClose={onClose}>
       <div className="user-head">
         <div>
           <span>{user.email}</span>

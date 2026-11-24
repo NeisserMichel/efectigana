@@ -13,6 +13,7 @@ export const WHATSAPP_NUMBER = (import.meta.env.VITE_WHATSAPP_NUMBER as string) 
 export type Profile = {
   id: string
   code: string
+  username: string | null
   email: string
   phone: string
   balance: number
@@ -70,6 +71,7 @@ export function errMsg(e: unknown): string {
   if (m.includes('Email not confirmed')) return 'Confirma tu correo antes de ingresar (revisa tu bandeja)'
   if (m.includes('Password should be')) return 'La contraseña debe tener al menos 6 caracteres'
   if (m.includes('profiles_phone_key')) return 'Este número de celular ya está registrado'
-  if (m.includes('Database error saving new user')) return 'No se pudo crear la cuenta. Verifica tu número de celular.'
+  if (m.includes('profiles_username')) return 'Ese nombre de usuario ya está en uso o no es válido'
+  if (m.includes('Database error saving new user')) return 'No se pudo crear la cuenta. Verifica tu nombre de usuario y tu celular (puede que ya estén registrados).'
   return m
 }

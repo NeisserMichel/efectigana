@@ -28,6 +28,7 @@ export function RechargeModal({ onClose }: { onClose: () => void }) {
       const text =
         `Hola ${APP_NAME} 👋\n` +
         `Quiero recargar saldo en mi cuenta de la web/app *${APP_NAME}*.\n\n` +
+        `• Usuario: *@${profile.username || '-'}*\n` +
         `• ID de registro: *${profile.code}*\n` +
         `• Monto a recargar: *${soles(value)}*\n` +
         `• Celular registrado: *+51 ${profile.phone}*\n` +

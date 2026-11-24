@@ -9,6 +9,8 @@ import HomePage from './pages/HomePage'
 import HistoryPage from './pages/HistoryPage'
 import AdminPage from './pages/AdminPage'
 import { ForceUpdateGate } from './components/AppUpdate'
+import { UsernameGate } from './components/UsernameGate'
+import { PasswordInput } from './components/PasswordInput'
 
 function Layout({ children }: { children: ReactNode }) {
   const { profile, signOut } = useAuth()
@@ -31,6 +33,7 @@ function Layout({ children }: { children: ReactNode }) {
         </div>
       </header>
       <main>{children}</main>
+      <UsernameGate />
       <nav className="bottom-nav">
         <NavLink to="/" end>
           <span>🎰</span>Pozos
@@ -66,7 +69,7 @@ function NewPassword() {
         <Logo big />
         <label>
           Nueva contraseña
-          <input type="password" value={p} onChange={(e) => setP(e.target.value)} />
+          <PasswordInput value={p} onChange={(e) => setP(e.target.value)} placeholder="Mínimo 6 caracteres" autoComplete="new-password" />
         </label>
         {msg && <div className="alert error">{msg}</div>}
         <button

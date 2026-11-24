@@ -1,5 +1,5 @@
 {
-  "versionCode": 1,
-  "versionName": "1.0.0",
-  "notes": "Primera versión de EfectiGana para Android."
+  "versionCode": 2,
+  "versionName": "1.1.0",
+  "notes": "• Nombre de usuario único\n• Mira quiénes participan en cada pozo\n• Pozos y cuenta regresiva en la pantalla de inicio\n• Botón para ver la contraseña"
 }
