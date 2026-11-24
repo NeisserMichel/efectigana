@@ -22,7 +22,7 @@ export default function AuthPage() {
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
   const nav = useNavigate()
-  const { pools, draws } = useLiveDraws()
+  const { pools, draws, error: liveError } = useLiveDraws()
   const formRef = useRef<HTMLDivElement>(null)
 
   const goToForm = (m: 'login' | 'register') => {
@@ -97,6 +97,7 @@ export default function AuthPage() {
           <DownloadAppButton compact />
           <CountdownCard draws={draws} />
           <h2 className="section-title">Pozos de esta semana</h2>
+          {liveError && <div className="alert error">No se pudo conectar con el servidor para cargar los montos.</div>}
           <PoolGrid pools={pools} draws={draws} onPlay={() => goToForm('register')} playLabel="Regístrate para jugar" />
         </section>
 

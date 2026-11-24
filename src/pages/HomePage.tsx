@@ -10,7 +10,7 @@ import { DownloadAppButton } from '../components/AppUpdate'
 
 export default function HomePage() {
   const { profile, session } = useAuth()
-  const { pools, draws, loading } = useLiveDraws()
+  const { pools, draws, loading, error } = useLiveDraws()
   const [bet, setBet] = useState<{ pool: Pool; draw: Draw } | null>(null)
   const [recharge, setRecharge] = useState(false)
   const [mine, setMine] = useState<Record<number, number>>({})
@@ -50,9 +50,9 @@ export default function HomePage() {
       <DownloadAppButton compact />
       <section className="balance-card">
         <div>
-          <span className="label">Hola, {profile?.username ? '@' + profile.username : profile?.code} 👋 · Tu saldo</span>
+          <span className="label">{profile?.username ? <>Hola, @{profile.username} 👋 · </> : null}Tu saldo</span>
           <div className="balance">{soles(profile?.balance)}</div>
-          <span className="code">ID: {profile?.code}</span>
+          {profile?.code && <span className="code">ID: {profile.code}</span>}
         </div>
         <button className="btn gold" onClick={() => setRecharge(true)}>
           + Recargar
@@ -63,7 +63,8 @@ export default function HomePage() {
 
       <h2 className="section-title">Pozos de esta semana</h2>
       {loading && <p className="muted">Cargando pozos…</p>}
-      <PoolGrid pools={pools} draws={draws} mine={mine} onPlay={(pool, draw) => setBet({ pool, draw })} />
+      {error && <div className="alert error">No se pudo conectar con el servidor para cargar los pozos. Intenta de nuevo en unos minutos.</div>}
+      <PoolGrid pools={pools} draws={draws} mine={mine} onPlay={(pool, draw) => draw && setBet({ pool, draw })} />
 
       <section className="how">
         <h2 className="section-title">¿Cómo funciona?</h2>

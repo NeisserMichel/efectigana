@@ -1,5 +1,5 @@
 {
-  "versionCode": 2,
-  "versionName": "1.1.0",
-  "notes": "• Nombre de usuario único\n• Mira quiénes participan en cada pozo\n• Pozos y cuenta regresiva en la pantalla de inicio\n• Botón para ver la contraseña"
+  "versionCode": 3,
+  "versionName": "1.1.1",
+  "notes": "• El reloj del sorteo siempre está contando\n• Botón de participantes con figuras\n• Mejoras al cargar los pozos"
 }

@@ -251,3 +251,8 @@ code { background: #0001; padding: 1px 5px; border-radius: 5px; }
 .hint { font-size: 12px; font-weight: 500; color: var(--muted); }
 .hint.ok { color: var(--green-d); }
 .hint.taken, .hint.invalid { color: var(--red); }
+.btn.people { display: flex; align-items: center; justify-content: center; gap: 8px; background: #eef6f1; color: var(--green-d); padding: 10px; font-size: 15px; border: 1.5px solid #cfe9da; }
+.btn.people:hover { background: #e2f3e9; }
+.people-count { background: var(--green); color: #fff; border-radius: 999px; padding: 1px 9px; font-size: 13px; }
+.part-avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 800; flex-shrink: 0; }
+.landing .alert, .page > .alert { margin-bottom: 12px; }
