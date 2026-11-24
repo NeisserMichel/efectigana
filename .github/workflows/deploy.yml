@@ -24,12 +24,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Las claves públicas de Supabase se leen de .env.production
       - name: Compilar
         run: npm run build -- --base=/${{ github.event.repository.name }}/
-        env:
-          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
-          VITE_WHATSAPP_NUMBER: '51917486188'
       # GitHub Pages no conoce las rutas de la app: 404.html carga la app igual
       - run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v3
