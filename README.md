@@ -51,6 +51,13 @@ npm run build    # producción (carpeta dist/)
 ```
 Para publicar: importa el repo en **Vercel** (o Netlify), agrega las 3 variables de entorno y despliega. `vercel.json` ya incluye las reglas de rutas.
 
+### 3b. Publicar gratis en GitHub Pages (ya configurado)
+El repo incluye `.github/workflows/deploy.yml`, que publica la web en cada push a `main`:
+1. Repo → **Settings → Pages** → *Source*: **GitHub Actions**.
+2. Repo → **Settings → Secrets and variables → Actions → pestaña Variables** → crea `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`.
+3. Pestaña **Actions** → *Publicar web en GitHub Pages* → **Run workflow**.
+La web queda en `https://neissermichel.github.io/efectigana/`.
+
 ### 4. App en el celular
 La web es una PWA: en Android abre la web en Chrome → menú → **Instalar app**; en iPhone, Safari → Compartir → **Agregar a inicio**. Si luego quieres publicarla en Play Store, se puede empaquetar con Capacitor o TWA sin cambiar el código.
 

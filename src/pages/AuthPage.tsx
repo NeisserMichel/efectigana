@@ -36,7 +36,7 @@ export default function AuthPage() {
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
-          options: { data: { phone: cel }, emailRedirectTo: window.location.origin },
+          options: { data: { phone: cel }, emailRedirectTo: window.location.origin + import.meta.env.BASE_URL },
         })
         if (error) throw error
         if (data.session) nav('/')
@@ -108,7 +108,7 @@ export default function AuthPage() {
               className="link"
               onClick={async () => {
                 if (!email) return setError('Escribe tu correo para recuperar la contraseña')
-                const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin + '/nueva-clave' })
+                const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin + import.meta.env.BASE_URL + 'nueva-clave' })
                 if (error) setError(errMsg(error))
                 else setInfo('Te enviamos un correo para restablecer tu contraseña.')
               }}

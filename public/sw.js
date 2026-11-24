@@ -2,7 +2,7 @@
 // No guarda en caché datos de saldo ni pozos (siempre se consultan en vivo).
 const CACHE = 'efectigana-v1'
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['/', '/icon.svg', '/manifest.webmanifest'])))
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['./', 'icon.svg', 'manifest.webmanifest'])))
   self.skipWaiting()
 })
 self.addEventListener('activate', (e) => {
@@ -20,6 +20,6 @@ self.addEventListener('fetch', (e) => {
         caches.open(CACHE).then((c) => c.put(req, copy))
         return res
       })
-      .catch(() => caches.match(req).then((r) => r || caches.match('/')))
+      .catch(() => caches.match(req).then((r) => r || caches.match('./')))
   )
 })

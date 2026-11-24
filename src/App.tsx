@@ -101,7 +101,7 @@ export default function App() {
   if (!supabaseConfigured) return <NotConfigured />
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
         <Routes>
           <Route path="/ingresar" element={<LoginGate />} />
           <Route path="/nueva-clave" element={<NewPassword />} />
