@@ -3,6 +3,7 @@ import { Modal } from './Modal'
 import { useAuth } from '../lib/auth'
 import { APP_NAME, WHATSAPP_NUMBER, errMsg, supabase } from '../lib/supabase'
 import { soles } from '../lib/format'
+import { isNativeApp } from '../lib/platform'
 
 const PRESETS = [5, 10, 20, 50, 100]
 
@@ -20,7 +21,7 @@ export function RechargeModal({ onClose }: { onClose: () => void }) {
     setError('')
     setBusy(true)
     // Abrimos la ventana antes del await para que el navegador del celular no la bloquee
-    const win = window.open('', '_blank')
+    const win = isNativeApp ? null : window.open('', '_blank')
     try {
       const { data: reqId, error } = await supabase.rpc('create_recharge_request', { p_amount: value })
       if (error) throw error

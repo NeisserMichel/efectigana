@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">EfectiGana</string>
+    <string name="title_activity_main">EfectiGana</string>
+    <string name="package_name">pe.efectigana.app</string>
+    <string name="custom_url_scheme">pe.efectigana.app</string>
+</resources>

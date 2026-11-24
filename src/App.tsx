@@ -8,6 +8,7 @@ import AuthPage from './pages/AuthPage'
 import HomePage from './pages/HomePage'
 import HistoryPage from './pages/HistoryPage'
 import AdminPage from './pages/AdminPage'
+import { ForceUpdateGate } from './components/AppUpdate'
 
 function Layout({ children }: { children: ReactNode }) {
   const { profile, signOut } = useAuth()
@@ -100,6 +101,7 @@ function NotConfigured() {
 export default function App() {
   if (!supabaseConfigured) return <NotConfigured />
   return (
+    <ForceUpdateGate>
     <AuthProvider>
       <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
         <Routes>
@@ -112,6 +114,7 @@ export default function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+    </ForceUpdateGate>
   )
 }
 

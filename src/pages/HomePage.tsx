@@ -5,6 +5,7 @@ import { supabase, type Draw, type Pool } from '../lib/supabase'
 import { countdown, fechaLima, pad, soles } from '../lib/format'
 import { BetModal } from '../components/BetModal'
 import { RechargeModal } from '../components/RechargeModal'
+import { DownloadAppButton } from '../components/AppUpdate'
 
 function useNow() {
   const [now, setNow] = useState(Date.now())
@@ -58,6 +59,7 @@ export default function HomePage() {
 
   return (
     <div className="page">
+      <DownloadAppButton compact />
       <section className="balance-card">
         <div>
           <span className="label">Tu saldo</span>

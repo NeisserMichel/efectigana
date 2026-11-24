@@ -61,6 +61,16 @@ La web queda en `https://neissermichel.github.io/efectigana/`.
 ### 4. App en el celular
 La web es una PWA: en Android abre la web en Chrome → menú → **Instalar app**; en iPhone, Safari → Compartir → **Agregar a inicio**. Si luego quieres publicarla en Play Store, se puede empaquetar con Capacitor o TWA sin cambiar el código.
 
+## App Android (APK) y actualizaciones obligatorias
+- La APK se compila sola en GitHub Actions (Capacitor) en cada push a `main` y se publica junto a la web en
+  `https://neissermichel.github.io/efectigana/efectigana.apk`. En la web aparece el botón **Descargar app para Android**.
+- Requiere 2 secretos en *Settings → Secrets and variables → Actions*: `ANDROID_KEYSTORE_BASE64` y `ANDROID_KEYSTORE_PASSWORD`.
+  Sin ellos, solo se publica la web.
+- **Lanzar una actualización obligatoria:** edita `app-version.json`, sube `versionCode` en 1 (ej. 1 → 2), cambia
+  `versionName` y `notes`, y haz push. Al abrir la app, los usuarios con una versión anterior verán una pantalla que
+  no les deja continuar hasta descargar e instalar la nueva APK.
+- Si solo cambias la web sin subir `versionCode`, la web se actualiza pero la app no pide actualizar.
+
 ## Ajustes útiles (SQL)
 ```sql
 update settings set value = '15' where key = 'commission_pct';   -- cambiar comisión

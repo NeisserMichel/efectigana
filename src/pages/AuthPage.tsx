@@ -2,6 +2,8 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase, errMsg } from '../lib/supabase'
 import { Logo } from '../components/Logo'
+import { DownloadAppButton } from '../components/AppUpdate'
+import { isNativeApp, WEB_URL } from '../lib/platform'
 
 export default function AuthPage() {
   const [mode, setMode] = useState<'login' | 'register'>('login')
@@ -36,7 +38,7 @@ export default function AuthPage() {
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
-          options: { data: { phone: cel }, emailRedirectTo: window.location.origin + import.meta.env.BASE_URL },
+          options: { data: { phone: cel }, emailRedirectTo: isNativeApp ? WEB_URL : window.location.origin + import.meta.env.BASE_URL },
         })
         if (error) throw error
         if (data.session) nav('/')
@@ -57,6 +59,7 @@ export default function AuthPage() {
       <div className="auth-card">
         <Logo big />
         <p className="tagline">Recarga, juega y gana cada domingo a las 8 p.m.</p>
+        <DownloadAppButton />
 
         <div className="tabs">
           <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')} type="button">
@@ -108,7 +111,7 @@ export default function AuthPage() {
               className="link"
               onClick={async () => {
                 if (!email) return setError('Escribe tu correo para recuperar la contraseña')
-                const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin + import.meta.env.BASE_URL + 'nueva-clave' })
+                const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: (isNativeApp ? WEB_URL : window.location.origin + import.meta.env.BASE_URL) + 'nueva-clave' })
                 if (error) setError(errMsg(error))
                 else setInfo('Te enviamos un correo para restablecer tu contraseña.')
               }}

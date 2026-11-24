@@ -1,4 +1,12 @@
-name: Publicar web en GitHub Pages
+name: Publicar web y APK
+
+# Cada push a main:
+#  1. Compila la APK de Android (firmada con los secretos ANDROID_KEYSTORE_*)
+#  2. Compila la web
+#  3. Publica todo en GitHub Pages: la web + efectigana.apk + version.json
+#
+# Para lanzar una ACTUALIZACIÓN OBLIGATORIA de la app:
+#  sube "versionCode" (y "versionName") en app-version.json y haz push.
 
 on:
   push:
@@ -17,18 +25,63 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+
       - run: npm ci
+
+      # ---------------- APK de Android ----------------
+      - name: Preparar Java 21
+        if: env.HAS_KEYSTORE == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Compilar web para la app y sincronizar Capacitor
+        if: env.HAS_KEYSTORE == 'true'
+        run: |
+          npm run build
+          npx cap sync android
+
+      - name: Compilar APK firmada
+        if: env.HAS_KEYSTORE == 'true'
+        env:
+          ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/efectigana-release.p12
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: efectigana
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$ANDROID_KEYSTORE_FILE"
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+          cp app/build/outputs/apk/release/app-release.apk "${{ runner.temp }}/efectigana.apk"
+          rm -f "$ANDROID_KEYSTORE_FILE"
+
+      # ---------------- Web ----------------
       # Las claves públicas de Supabase se leen de .env.production
-      - name: Compilar
+      - name: Compilar web
         run: npm run build -- --base=/${{ github.event.repository.name }}/
+
+      - name: Agregar APK y version.json a la web
+        if: env.HAS_KEYSTORE == 'true'
+        run: |
+          cp "${{ runner.temp }}/efectigana.apk" dist/efectigana.apk
+          node -e "const v=require('./app-version.json'); require('fs').writeFileSync('dist/version.json', JSON.stringify({...v, apk:'efectigana.apk', publishedAt:new Date().toISOString()}, null, 2))"
+          ls -la dist/efectigana.apk dist/version.json
+
       # GitHub Pages no conoce las rutas de la app: 404.html carga la app igual
       - run: cp dist/index.html dist/404.html
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
