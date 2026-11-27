@@ -67,6 +67,27 @@ jobs:
           cp app/build/outputs/apk/release/app-release.apk "${{ runner.temp }}/efectigana.apk"
           rm -f "$ANDROID_KEYSTORE_FILE"
 
+      # Comprueba que la APK está firmada y que la firma es la clave de EfectiGana.
+      # Si no coincide, la publicación se detiene (así nunca sale una APK que no se pueda actualizar).
+      - name: Verificar firma de la APK
+        if: env.HAS_KEYSTORE == 'true'
+        env:
+          EXPECTED_SHA256: 01e90f5c30c8ac31b1236357b5f4066d52ff021a5f80c5c8947317854c3ec91f
+        run: |
+          APKSIGNER="$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)apksigner"
+          OUT="$("$APKSIGNER" verify --verbose --print-certs "${{ runner.temp }}/efectigana.apk")"
+          echo "$OUT"
+          SHA=$(echo "$OUT" | grep -m1 'certificate SHA-256 digest' | awk '{print $NF}')
+          SCHEMES=$(echo "$OUT" | grep -E 'Verified using v[0-9].*true' | sed 's/Verified using //' | tr '\n' ' ')
+          DN=$(echo "$OUT" | grep -m1 'certificate DN' | sed 's/.*DN: //')
+          VERSION=$(node -p "require('./app-version.json').versionName")
+          if [ "$SHA" = "$EXPECTED_SHA256" ]; then
+            echo "::notice title=APK firmada correctamente::v$VERSION | $DN | SHA-256 $SHA | Esquemas: $SCHEMES"
+          else
+            echo "::error title=Firma incorrecta::La APK no está firmada con la clave de EfectiGana (SHA-256 obtenido: '$SHA')"
+            exit 1
+          fi
+
       # ---------------- Web ----------------
       # Las claves públicas de Supabase se leen de .env.production
       - name: Compilar web
